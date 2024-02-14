@@ -71,9 +71,9 @@ class WikipediaScraper:
     def to_json_file(self, filepath: str):
         self.filepath = filepath
         # Use the with statement to open the file in write mode
-        with open(filepath, "w") as file:
+        with open(filepath, "w", encoding="utf-8") as file:
             # Use the json.dump() function to write the dictionary to the file
-            json.dump(self.get_leaders(), file)
+            json.dump(self.get_leaders(), file, ensure_ascii=False)
 
     def sanitize(self, paragraph):
         self.paragraph = paragraph
