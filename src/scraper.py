@@ -24,21 +24,17 @@ class WikipediaScraper:
 
     def refresh_cookie(self):
         cookie_endpoint = self.cookies_endpoint
-        session = Session()
-        cookie = session.get(cookie_endpoint)
+        cookie = self.session.get(cookie_endpoint)
         return cookie
 
     def get_countries(self):
-        session = Session()
         country_endpoint = self.country_endpoint
         cookie = self.refresh_cookie()
-        result = session.get(country_endpoint, cookies=cookie.cookies).json()
+        result = self.session.get(country_endpoint, cookies=cookie.cookies).json()
         return result
 
     def get_first_paragraph(self, wikipedia_url):
-        self.wikipedia_url = wikipedia_url
-        session = Session()
-        response = session.get(wikipedia_url)
+        response = self.session.get(wikipedia_url)
         soup = BeautifulSoup(response.text, "html.parser")
         for paragraph in soup.find_all("p"):
             text = paragraph.get_text().strip()
@@ -48,18 +44,30 @@ class WikipediaScraper:
                 break
         return first_paragraph
 
+    def to_json_file(self, filepath: str):
+        # Use the with statement to open the file in write mode
+        with open(filepath, "w", encoding="utf-8") as file:
+            # Use the json.dump() function to write the dictionary to the file
+            json.dump(self.get_leaders(), file, ensure_ascii=False, indent=1)
+
+    def sanitize(self, paragraph):
+        paragraph = re.sub(
+            r"<.*?>|\[.*?\]|\(.*?\)|\{.*?\}|\[.*?\]|\/.*?\/|\|.*?\|", "", paragraph
+        )
+        paragraph = re.sub(r"\s+", " ", paragraph)
+        paragraph = re.sub(r" ,", ",", paragraph)
+        return paragraph
+
     def get_leaders(self):
-        leaders_endpoint = self.leaders_endpoint
         check_url = self.base_url + "/check"
-        session = Session()
-        check = session.get(check_url)
+        check = self.session.get(check_url)
         countries = self.get_countries()
         if check.status_code != 200:
             cookies = self.refresh_cookie()
         leaders_per_country = self.leaders_data
         for country in countries:
-            leaders_per_country[country] = session.get(
-                leaders_endpoint + "?country=" + country, cookies=cookies.cookies
+            leaders_per_country[country] = self.session.get(
+                self.leaders_endpoint + "?country=" + country, cookies=cookies.cookies
             ).json()
         for country in countries:
             for leader in leaders_per_country[country]:
@@ -67,19 +75,3 @@ class WikipediaScraper:
                 first_paragraph = self.get_first_paragraph(leader_url)
                 leader["first_paragraph"] = first_paragraph
         return leaders_per_country
-
-    def to_json_file(self, filepath: str):
-        self.filepath = filepath
-        # Use the with statement to open the file in write mode
-        with open(filepath, "w", encoding="utf-8") as file:
-            # Use the json.dump() function to write the dictionary to the file
-            json.dump(self.get_leaders(), file, ensure_ascii=False)
-
-    def sanitize(self, paragraph):
-        self.paragraph = paragraph
-        paragraph = re.sub(
-            r"<.*?>|\[.*?\]|\(.*?\)|\{.*?\}|\[.*?\]|\/.*?\/|\|.*?\|", "", paragraph
-        )
-        paragraph = re.sub(r"\s+", " ", paragraph)
-        paragraph = re.sub(r" ,", ",", paragraph)
-        return paragraph
