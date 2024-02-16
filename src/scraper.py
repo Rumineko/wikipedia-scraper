@@ -3,6 +3,7 @@ from requests import Session
 from bs4 import BeautifulSoup
 import re
 import csv
+from multiprocessing import Pool
 
 
 class WikipediaScraper:
@@ -71,6 +72,12 @@ class WikipediaScraper:
         paragraph = re.sub(r" ,", ",", paragraph)
         return paragraph
 
+    def process_leader(self, leader):
+        leader_url = leader["wikipedia_url"]
+        first_paragraph = self.get_first_paragraph(leader_url)
+        leader["first_paragraph"] = first_paragraph
+        return leader
+
     def get_leaders(self):
         check_url = self.base_url + "/check"
         check = self.session.get(check_url)
@@ -78,13 +85,13 @@ class WikipediaScraper:
         if check.status_code != 200:
             cookies = self.refresh_cookie()
         leaders_per_country = self.leaders_data
-        for country in countries:
-            leaders_per_country[country] = self.session.get(
-                self.leaders_endpoint + "?country=" + country, cookies=cookies.cookies
-            ).json()
-        for country in countries:
-            for leader in leaders_per_country[country]:
-                leader_url = leader["wikipedia_url"]
-                first_paragraph = self.get_first_paragraph(leader_url)
-                leader["first_paragraph"] = first_paragraph
+
+        with Pool() as pool:
+            for country in countries:
+                leaders = self.session.get(
+                    self.leaders_endpoint + "?country=" + country,
+                    cookies=cookies.cookies,
+                ).json()
+                leaders_per_country[country] = pool.map(self.process_leader, leaders)
+
         return leaders_per_country
