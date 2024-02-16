@@ -32,11 +32,8 @@ This script retrieves data from an API, and organizes data into different countr
 ## 🛎️ Usage
 
 1. Clone the repository to your local machine.
-
-   2 .To run the script, you can execute the `main.py` file from your command line:
-
-    ``   python main.py   ``
-
+2. To run the script, you can execute the `main.py` file from your command line:
+   ``python main.py``
 3. The script does everything automatically. It will grab data from the API, and creates a few files. To read the raw output, you can open, after execution, leaders.json. If you want the data in a more readable and organized format, check the countries folder, and the files inside.
 
 ## ⏱️ Timeline
