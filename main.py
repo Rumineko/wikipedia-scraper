@@ -11,6 +11,7 @@ output = "leaders.json"
 csvoutput = "countries"
 
 
+# The main function initializes the WikipediaScraper object and calls the to_json_file and to_csv_files methods to write the leaders data to JSON and CSV files
 def main():
     wiki = WikipediaScraper(
         base_url=base_url,

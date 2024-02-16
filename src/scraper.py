@@ -1,12 +1,13 @@
 import json
-from requests import Session
-from bs4 import BeautifulSoup
 import re
 import csv
+
+from requests import Session
+from bs4 import BeautifulSoup
 from multiprocessing import Pool
 
 
-# Our WikipediaScraper class!!!
+# Our WikipediaScraper class
 class WikipediaScraper:
     # The init method initializes the WikipediaScraper object with the base URL, endpoints, leaders data, and cookie
     def __init__(
