@@ -20,9 +20,9 @@ This script retrieves data from an API, and organizes data into different countr
 │   ├── fr.csv
 │   ├── ma.csv
 │   ├── ru.csv
-│   ├── us.csv
+│   └── us.csv
 ├── src/
-│   ├── scraper.py
+│   └── scraper.py
 ├── .gitignore
 ├── leaders.json
 ├── main.py
