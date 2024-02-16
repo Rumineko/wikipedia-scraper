@@ -8,6 +8,7 @@ cookie_endpoint = base_url + "/cookie"
 check_endpoint = base_url + "/check"
 country_endpoint = base_url + "/countries"
 output = "leaders.json"
+csvoutput = "countries"
 
 
 def main():
@@ -20,6 +21,7 @@ def main():
         cookie=None,
     )
     wiki.to_json_file(output)
+    wiki.to_csv_files(output, csvoutput)
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

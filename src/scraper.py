@@ -2,6 +2,7 @@ import json
 from requests import Session
 from bs4 import BeautifulSoup
 import re
+import csv
 
 
 class WikipediaScraper:
@@ -49,6 +50,18 @@ class WikipediaScraper:
         with open(filepath, "w", encoding="utf-8") as file:
             # Use the json.dump() function to write the dictionary to the file
             json.dump(self.get_leaders(), file, ensure_ascii=False, indent=1)
+
+    def to_csv_files(self, infile: str, output_dir: str):
+        with open(infile, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        for key, value in data.items():
+            csv_filename = f"{output_dir}/{key}.csv"
+            with open(csv_filename, "w", encoding="utf-8", newline="") as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow(value[0].keys())  # Write header row
+                for item in value:
+                    writer.writerow(item.values())
 
     def sanitize(self, paragraph):
         paragraph = re.sub(
